@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'profile.dart';
+import 'login.dart';
+import 'Create_Post.dart'; // Import the CreatePostPage file
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -25,6 +27,37 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _logout() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Logout'),
+          content: Text('Do you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Perform logout actions and navigate to login.dart
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  (route) => false,
+                );
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -41,6 +74,12 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           title: Text('CampusLink'),
           automaticallyImplyLeading: _currentIndex != 0,
+          actions: [
+            IconButton(
+              onPressed: _logout,
+              icon: Icon(Icons.logout),
+            ),
+          ],
         ),
         body: _screens[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
@@ -95,28 +134,15 @@ class HomeContent extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              //Image.asset('assets/post_$index.jpg'),
+              Image.network(
+                'https://via.placeholder.com/400x200',
+                fit: BoxFit.cover,
+              ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Text(
-                  'Caption text goes here',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                child: Text('This is a sample post.'),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.favorite_border),
-                    SizedBox(width: 8.0),
-                    Icon(Icons.chat_bubble_outline),
-                    SizedBox(width: 8.0),
-                    Icon(Icons.share),
-                    Spacer(),
-                    Icon(Icons.bookmark_border),
-                  ],
-                ),
-              ),
+              Divider(),
             ],
           ),
         );
@@ -129,7 +155,7 @@ class SearchContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Search'),
+      child: Text('Search Content'),
     );
   }
 }
@@ -138,7 +164,15 @@ class AddContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Add'),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreatePostPage()),
+          );
+        },
+        child: Text('Add'),
+      ),
     );
   }
 }
@@ -147,13 +181,7 @@ class LikesContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Likes'),
+      child: Text('Likes Content'),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: HomeScreen(),
-  ));
 }

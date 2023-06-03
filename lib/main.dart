@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'splash_screen.dart';
+import 'login.dart';
+import 'Homescreen.dart';
 
 void main() {
-  runApp(LoginApp());
+  runApp(MyApp());
 }
 
-class LoginApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login Page',
+      title: 'My App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
+      home: SplashScreen(),
       routes: {
-        '/': (context) => SplashScreen(),
         '/login': (context) => LoginPage(),
+        '/home': (context) => HomeScreen(),
       },
     );
   }

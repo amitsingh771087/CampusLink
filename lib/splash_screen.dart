@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'login.dart';
+import 'Homescreen.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -17,21 +20,41 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2), // Change the duration to 2 seconds
+      duration: Duration(seconds: 2),
     );
 
-    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+    _animation = Tween<double>(begin: 1.0, end: 1.5).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
 
-    // Start the animation
-    _animationController.forward();
+    _animationController.repeat(reverse: true);
 
-    // Navigate to the login page after 2 seconds
-    Future.delayed(Duration(seconds: 2), () {
+    // Check if user is already logged in
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      // User is logged in, redirect to HomeScreen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
-    });
+    } else {
+      // User is not logged in, redirect to LoginPage
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      });
+    }
   }
 
   @override
@@ -43,15 +66,15 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      backgroundColor: Color(0xFF7588EF),
       body: Center(
-        child: FadeTransition(
-          opacity: _animation,
+        child: ScaleTransition(
+          scale: _animation,
           child: Text(
-            'My App',
+            'CampusLink',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 24.0,
+              fontSize: 32.0,
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 
-import 'register.dart'; // Import the register.dart file
-import 'forgot_password.dart'; // Import the forgot_password.dart file
-import 'Homescreen.dart'; // Import the Homescreen.dart file
-
+import 'register.dart';
+import 'forgot_password.dart';
+import 'Homescreen.dart';
+import 'login.dart';
 
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -83,6 +85,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       // Example: Print the user data
       print('User Data: $responseData');
 
+      // Save the login status in local storage
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -129,7 +135,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     ),
                     SizedBox(height: 16.0),
                     Text(
-                      'Welcome to CampusLink',
+                      'CampusLink',
                       style: TextStyle(
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,
@@ -141,9 +147,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 ),
               ),
 
-              SizedBox(
-                height: 60.0,
-              ),
+              SizedBox(height: 48.0),
 
               TextField(
                 controller: _usernameController,
@@ -151,15 +155,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   labelText: 'Username',
                   filled: true,
                   fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
                 ),
               ),
 
-              SizedBox(
-                height: 20.0,
-              ),
+              SizedBox(height: 16.0),
 
               TextField(
                 controller: _passwordController,
@@ -167,13 +166,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   labelText: 'Password',
                   filled: true,
                   fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _isObscure ? Icons.visibility_off : Icons.visibility,
-                      color: Colors.grey,
+                      _isObscure ? Icons.visibility : Icons.visibility_off,
                     ),
                     onPressed: _togglePasswordVisibility,
                   ),
@@ -181,39 +176,31 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 obscureText: _isObscure,
               ),
 
-              SizedBox(
-                height: 20.0,
+              SizedBox(height: 16.0),
+
+              ElevatedButton(
+                onPressed: _login,
+                child: Text('Log In'),
               ),
 
-              Align(
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: _login,
-                  child: Text('Login'),
-                ),
-              ),
-
-              SizedBox(
-                height: 20.0,
-              ),
+              SizedBox(height: 16.0),
 
               TextButton(
                 onPressed: _navigateToForgotPassword,
                 child: Text(
                   'Forgot Password?',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
 
-              SizedBox(
-                height: 20.0,
-              ),
+              SizedBox(height: 16.0),
 
-              ElevatedButton(
+              TextButton(
                 onPressed: _navigateToRegister,
-                child: Text('Register User'),
+                child: Text(
+                  'Don\'t have an account? Register',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -221,10 +208,4 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: LoginPage(),
-  ));
 }

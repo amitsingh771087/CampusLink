@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'create_profile.dart';
+import 'login.dart'; // Import the login.dart file
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -15,6 +18,7 @@ class _RegisterPageState extends State<RegisterPage>
   TextEditingController _uuidController = TextEditingController();
   TextEditingController _classController = TextEditingController();
   TextEditingController _divController = TextEditingController();
+  TextEditingController _usernameController = TextEditingController();
 
   @override
   void initState() {
@@ -36,21 +40,24 @@ class _RegisterPageState extends State<RegisterPage>
     _uuidController.dispose();
     _classController.dispose();
     _divController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
-  Future<bool> validateUUID(String uuid) async {
+  Future<bool> validateUUIDAndUsername(String uuid, String username) async {
     // API endpoint
-    String apiUrl = 'https://campuslinkbackend.onrender.com/api/user/verifyUser/$uuid';
+    String apiUrl = 'https://campuslinkbackend.onrender.com/api/user/verifyUser/$uuid/$username';
 
     // Make a GET request to the API
     var response = await http.get(Uri.parse(apiUrl));
+    var data = json.decode(response.body);
+    var message = data['message'];
 
-    if (response.statusCode == 200) {
-      // UUID verification successful
+    if (message == 'true') {
+      // UUID and username verification successful
       return true;
     } else {
-      // UUID verification failed
+      // UUID and username verification failed
       return false;
     }
   }
@@ -60,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('UUID Validation'),
+          title: Text('Validation'),
           content: Text(message),
           actions: [
             TextButton(
@@ -75,23 +82,39 @@ class _RegisterPageState extends State<RegisterPage>
     );
   }
 
+  void navigateToCreateProfile(String fullName, String uuid, String className, String div, String username) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateProfilePage(
+          uuid: uuid,
+          fullName: fullName,
+          className: className,
+          div: div,
+          username: username,
+        ),
+      ),
+    );
+  }
+
   void register() async {
     String fullName = _fullNameController.text.trim();
     String uuid = _uuidController.text.trim();
     String className = _classController.text.trim();
     String div = _divController.text.trim();
+    String username = _usernameController.text.trim();
 
-    if (fullName.isEmpty || uuid.isEmpty || className.isEmpty || div.isEmpty) {
+    if (fullName.isEmpty || uuid.isEmpty || className.isEmpty || div.isEmpty || username.isEmpty) {
       showAlertDialog(context, 'All fields are required');
       return;
     }
 
-    bool isValidUUID = await validateUUID(uuid);
+    bool isValidUUIDAndUsername = await validateUUIDAndUsername(uuid, username);
 
-    if (isValidUUID) {
-      showAlertDialog(context, 'User is from our campus');
+    if (isValidUUIDAndUsername) {
+      navigateToCreateProfile(fullName, uuid, className, div, username);
     } else {
-      showAlertDialog(context, 'User is not from our campus');
+      showAlertDialog(context, 'UUID or Username is invalid');
     }
   }
 
@@ -112,13 +135,8 @@ class _RegisterPageState extends State<RegisterPage>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Register',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                ),
+              FlutterLogo(
+                size: 100.0,
               ),
               SizedBox(height: 24.0),
               Padding(
@@ -139,6 +157,18 @@ class _RegisterPageState extends State<RegisterPage>
                   controller: _uuidController,
                   decoration: InputDecoration(
                     labelText: 'UUID',
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.0),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
+                child: TextField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(
+                    labelText: 'Username',
                     filled: true,
                     fillColor: Colors.white,
                   ),
@@ -180,6 +210,24 @@ class _RegisterPageState extends State<RegisterPage>
               ElevatedButton(
                 onPressed: register,
                 child: Text('Register'),
+              ),
+              SizedBox(height: 16.0),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginPage(),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Already have an Account? Login',
+                  style: TextStyle(
+                    color: Colors.white,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
               ),
             ],
           ),
