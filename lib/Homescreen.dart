@@ -16,9 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     HomeContent(),
     SearchContent(),
-    AddContent(),
-    LikesContent(),
-    ProfilePage(),
+    CreatePostPage(),
+    
+ProfilePage(),
   ];
 
   void _onTabTapped(int index) {
@@ -99,10 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icon(Icons.add),
               label: 'Add',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_border),
-              label: 'Likes',
-            ),
+           
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Profile',

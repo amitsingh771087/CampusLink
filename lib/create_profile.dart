@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -67,6 +68,21 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   try {
     // Convert image file to base64
     String base64Image = base64Encode(_imageFile!.readAsBytesSync());
+   // img.Image resizedImage = img.copyResize(base64Image!, width: 725, height: 725);
+
+    int maxSizeInBytes = 500 * 1024; // 500KB
+    int fileSizeInBytes = _imageFile!.lengthSync();
+    if (fileSizeInBytes > maxSizeInBytes) {
+      Fluttertoast.showToast(
+        msg: 'Image is too large. Maximum size allowed is 500KB',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
     // Make API request with the base64Image
     _registerUser(base64Image);
   } catch (e) {

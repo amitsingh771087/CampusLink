@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as img;
+import 'package:campuslink/create_profile.dart';
 
 class CreatePostPage extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   File? _image;
   final picker = ImagePicker();
   TextEditingController _captionController = TextEditingController();
-
+  
   @override
   void dispose() {
     _captionController.dispose();
@@ -45,7 +46,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   String _imageToBase64(img.Image image) {
     // Encode the image to JPEG format
-    List<int> jpgBytes = img.encodeJpg(image, quality: 100);
+    List<int> jpgBytes = img.encodeJpg(image, quality: 66);
 
     // Convert List<int> to Uint8List
     Uint8List uint8List = Uint8List.fromList(jpgBytes);
@@ -64,18 +65,34 @@ class _CreatePostPageState extends State<CreatePostPage> {
     img.Image? decodedImage = img.decodeImage(imageFile.readAsBytesSync());
 
     // Resize the image if needed
-    img.Image resizedImage = img.copyResize(decodedImage!, width: 500, height: 500);
+    img.Image resizedImage = img.copyResize(decodedImage!, width: 725, height: 725);
 
+    int maxSizeInBytes = 2500 * 1024; // 500KB
+    int fileSizeInBytes = imageFile.lengthSync();
+    if (fileSizeInBytes > maxSizeInBytes) {
+      Fluttertoast.showToast(
+        msg: 'Image is too large. Maximum size allowed is 500KB',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+  
     // Convert the image to base64
     String base64Image = _imageToBase64(resizedImage);
-
+    final date = DateTime.now().toLocal().toString();
+    final time = TimeOfDay.now().toString();
+    
     Map<String, dynamic> requestBody = {
       "Image": base64Image,
       "Caption": caption,
-      "UUID": "2121179",
-      "Date": "31-5-2023",
-      "Num_likes": "132",
-      "Time": "16:41",
+      "UUID":"2121179",
+      "Date":date,
+      "Num_likes": 144,
+      "Time":time,
       "Comment_id": "64701212231284d6c890234210"
     };
 
@@ -89,7 +106,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         body: jsonBody,
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         print('Image uploaded successfully');
         Fluttertoast.showToast(
           msg: 'Image uploaded successfully',

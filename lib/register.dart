@@ -134,9 +134,11 @@ class _RegisterPageState extends State<RegisterPage>
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            
             children: [
               FlutterLogo(
                 size: 100.0,
+                
               ),
               SizedBox(height: 24.0),
               Padding(
@@ -147,9 +149,11 @@ class _RegisterPageState extends State<RegisterPage>
                     labelText: 'Full Name',
                     filled: true,
                     fillColor: Colors.white,
+                    
                   ),
                 ),
               ),
+              
               SizedBox(height: 16.0),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0),

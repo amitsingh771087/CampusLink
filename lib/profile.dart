@@ -23,8 +23,8 @@ class ProfilePage extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'John Doe',
+                      Text(" John doe"
+                        ,
                         style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
