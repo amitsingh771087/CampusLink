@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'profile.dart';
 import 'login.dart';
@@ -17,8 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeContent(),
     SearchContent(),
     CreatePostPage(),
-    
-ProfilePage(),
+    ProfilePage(),
   ];
 
   void _onTabTapped(int index) {
@@ -41,7 +42,7 @@ ProfilePage(),
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
-                  (route) => false,
+                      (route) => false,
                 );
               },
               child: Text('Yes'),
@@ -99,7 +100,7 @@ ProfilePage(),
               icon: Icon(Icons.add),
               label: 'Add',
             ),
-           
+
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Profile',
@@ -111,12 +112,57 @@ ProfilePage(),
   }
 }
 
-class HomeContent extends StatelessWidget {
+
+class HomeContent extends StatefulWidget {
   @override
+  _HomeContentState createState() => _HomeContentState();
+  // HomeContent();
+}
+class _HomeContentState extends State<HomeContent> {
+  List<Map<String, dynamic>> posts = []; // List to store posts
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData(); // Fetch data from API when the widget is initialized
+  }
+
+  Future<void> fetchData() async {
+    var url = Uri.parse('https://campuslinkbackendpost.onrender.com/api/post');
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+
+        setState(() {
+          posts = List<Map<String, dynamic>>.from(jsonResponse);
+        });
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+@override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: 10,
+      itemCount: posts.length,
       itemBuilder: (context, index) {
+        Map<String, dynamic> post = posts[index];
+
+        String imageBase64 = post['Image'];
+        String imageUrl = 'https://campuslinkbackendpost.onrender.com/api/post/:Image';
+
+        // if (imageBase64 != null && imageBase64.isNotEmpty) {
+        //   List<int> bytes = base64Decode(imageBase64);
+        //   imageUrl = 'data:image/jpg;base64,' + base64Encode(bytes);
+        // }
+
+
         return Container(
           margin: EdgeInsets.symmetric(vertical: 8.0),
           child: Column(
@@ -131,21 +177,35 @@ class HomeContent extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              Image.network(
-                'https://via.placeholder.com/400x200',
+              imageUrl.isNotEmpty
+                  ? Image.memory(
+                base64Decode(imageBase64),
                 fit: BoxFit.cover,
-              ),
+              )
+                  : SizedBox(), // Empty placeholder if image URL is empty
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Text('This is a sample post.'),
-              ),
+                child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                       children: [
+                         Text('Caption:',
+                                style: TextStyle(
+                                       fontWeight: FontWeight.bold,
+                                     ),
+                           ),
+                           Text(post['Caption'] ?? 'caption'),
+        ],
+        ),
+        ),
+                //child: Text(post['Caption'] ?? 'caption'),
+
               Divider(),
             ],
           ),
         );
       },
     );
-  }
+}
 }
 
 class SearchContent extends StatelessWidget {

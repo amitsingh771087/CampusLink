@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as img;
+import 'package:intl/intl.dart';
 import 'package:campuslink/create_profile.dart';
 
 class CreatePostPage extends StatefulWidget {
@@ -70,20 +71,37 @@ class _CreatePostPageState extends State<CreatePostPage> {
     int maxSizeInBytes = 2500 * 1024; // 500KB
     int fileSizeInBytes = imageFile.lengthSync();
     if (fileSizeInBytes > maxSizeInBytes) {
-      Fluttertoast.showToast(
-        msg: 'Image is too large. Maximum size allowed is 500KB',
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
+      
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Image Size Exceeded'),
+          content: Text('The selected image is too large. Maximum size allowed is 2.5 MB .'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+    
       return;
     }
 
   
     // Convert the image to base64
     String base64Image = _imageToBase64(resizedImage);
-    final date = DateTime.now().toLocal().toString();
+    DateTime now = DateTime.now();
+
+    // Format the date and time
+    String formattedDateTime = DateFormat('dd-MM-yyyy HH:mm:ss').format(now);
+
+    final date = formattedDateTime;
     final time = TimeOfDay.now().toString();
     
     Map<String, dynamic> requestBody = {

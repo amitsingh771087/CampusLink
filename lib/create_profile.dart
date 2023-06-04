@@ -73,13 +73,24 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
     int maxSizeInBytes = 500 * 1024; // 500KB
     int fileSizeInBytes = _imageFile!.lengthSync();
     if (fileSizeInBytes > maxSizeInBytes) {
-      Fluttertoast.showToast(
-        msg: 'Image is too large. Maximum size allowed is 500KB',
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Image Size Exceeded'),
+            content: Text('The selected image is too large. Maximum size allowed is 500 kb .'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
       );
+
       return;
     }
 
